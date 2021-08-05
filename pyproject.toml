@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "imdb-sentiment-api"
 version = "0.1.0"
-description = "API for FIMDB finetuned sentiment model"
+description = "API for IMDB finetuned sentiment model"
 authors = ["anish.shah.emails@gmail.com"]
 
 [tool.poetry.dependencies]
@@ -12,6 +12,8 @@ pydantic = "^1.3"
 requests = "^2.22.0"
 loguru = "^0.4.0"
 joblib = "^0.15.1"
+sklearn = "^0.0"
+wandb = "^0.11.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

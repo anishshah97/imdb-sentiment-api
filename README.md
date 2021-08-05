@@ -11,8 +11,8 @@ API for FIMDB finetuned sentiment model
 ### M.L Model Environment
 
 ```sh
-MODEL_PATH=./ml/model/
-MODEL_NAME=model.pkl
+LOCAL_MODEL_DIR=./ml/model/
+LOCAL_MODEL_NAME=model.pkl
 ```
 
 ### Update `/predict`

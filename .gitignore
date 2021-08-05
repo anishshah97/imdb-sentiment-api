@@ -62,3 +62,4 @@ maildir
 .env
 
 ml/model/*
+wandb/*

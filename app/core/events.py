@@ -1,5 +1,6 @@
 from typing import Callable
 
+import joblib
 from fastapi import FastAPI
 
 
@@ -9,11 +10,22 @@ def preload_model():
     """
     from services.predict import MachineLearningModelHandlerScore
 
-    MachineLearningModelHandlerScore.get_model()
+    # TODO: Fix this so we can more easily use env variables to pass in the load mechanism
+    MachineLearningModelHandlerScore.get_model(joblib.load)
 
 
-def create_start_app_handler(app: FastAPI) -> Callable:
-    def start_app() -> None:
+def download_latest_wandb_model():
+    """
+    In order to download model to load on memory for each worker
+    """
+    from services.predict import WANDBHandler
+
+    WANDBHandler.download_latest_model()
+
+
+def create_wandb_download_and_preload_handler(app: FastAPI) -> Callable:
+    def model_app() -> None:
+        download_latest_wandb_model()
         preload_model()
 
-    return start_app
+    return model_app

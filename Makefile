@@ -7,12 +7,12 @@ ifeq ($(TIMEOUT),)
 TIMEOUT := 60
 endif
 
-ifeq ($(MODEL_PATH),)
-MODEL_PATH := ./ml/model/
+ifeq ($(LOCAL_MODEL_DIR),)
+LOCAL_MODEL_DIR := ./ml/model/
 endif
 
-ifeq ($(MODEL_NAME),)
-MODEL_NAME := model.pkl
+ifeq ($(LOCAL_MODEL_NAME),)
+LOCAL_MODEL_NAME := model.pkl
 endif
 
 # Target section and Global definitions

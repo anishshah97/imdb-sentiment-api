@@ -1,6 +1,7 @@
 import os
 
-from core.config import MODEL_NAME, MODEL_PATH
+from core.config import (LOCAL_MODEL_DIR, LOCAL_MODEL_NAME, MODEL_VERSION,
+                         PROJECT_NAME)
 from core.errors import ModelLoadException, PredictException
 from loguru import logger
 
@@ -24,10 +25,10 @@ class MachineLearningModelHandlerScore(object):
     @staticmethod
     def load(load_wrapper):
         model = None
-        if MODEL_PATH.endswith("/"):
-            path = f"{MODEL_PATH}{MODEL_NAME}"
+        if LOCAL_MODEL_DIR.endswith("/"):
+            path = f"{LOCAL_MODEL_DIR}{LOCAL_MODEL_NAME}"
         else:
-            path = f"{MODEL_PATH}/{MODEL_NAME}"
+            path = f"{LOCAL_MODEL_DIR}/{LOCAL_MODEL_NAME}"
         if not os.path.exists(path):
             message = f"Machine learning model at {path} not exists!"
             logger.error(message)
@@ -38,3 +39,25 @@ class MachineLearningModelHandlerScore(object):
             logger.error(message)
             raise ModelLoadException(message)
         return model
+
+
+class WANDBHandler(object):
+
+    def download_latest_model():
+        import wandb
+        run = wandb.init(project=PROJECT_NAME, job_type="inference")
+        model_at = run.use_artifact(LOCAL_MODEL_NAME.split(".")[
+                                    0] + ":" + MODEL_VERSION)
+
+        if LOCAL_MODEL_DIR.endswith("/"):
+            path = f"{LOCAL_MODEL_DIR}{LOCAL_MODEL_NAME}"
+        else:
+            path = f"{LOCAL_MODEL_DIR}/{LOCAL_MODEL_NAME}"
+
+        if os.path.exists(path):
+            message = f"Machine learning model at {path} exists! Overwriting"
+            logger.info(message)
+            os.remove(path)
+
+        model_at.download(LOCAL_MODEL_DIR)
+        return None

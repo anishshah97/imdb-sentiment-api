@@ -28,5 +28,7 @@ logging.basicConfig(
 )
 logger.configure(handlers=[{"sink": sys.stderr, "level": LOGGING_LEVEL}])
 
-MODEL_PATH = config("MODEL_PATH", default="./ml/model/")
-MODEL_NAME = config("MODEL_NAME", default="model.pkl")
+LOCAL_MODEL_DIR = config("LOCAL_MODEL_DIR", default="./ml/model/")
+LOCAL_MODEL_NAME = config("LOCAL_MODEL_NAME", default="model.pkl")
+
+MODEL_VERSION = config("MODEL_VERSION", default="latest")
