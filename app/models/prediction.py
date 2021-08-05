@@ -9,3 +9,7 @@ class MachineLearningResponse(BaseModel):
 
 class HealthResponse(BaseModel):
     status: bool
+
+
+class BERTSentimentResponse(BaseModel):
+    predictions: list

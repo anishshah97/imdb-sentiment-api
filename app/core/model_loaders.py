@@ -1,4 +1,5 @@
 import joblib
+import tensorflow as tf
 
 
 def load_model_loaders():
@@ -10,6 +11,7 @@ def load_model_loaders():
     """
     load_mechanisms = {
         "joblib": joblib.load,
+        "keras": tf.keras.models.load_model
     }
     print("Loaders defined")
     print(load_mechanisms.keys())

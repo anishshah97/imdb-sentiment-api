@@ -11,11 +11,11 @@ def preload_model():
     """
     In order to load model on memory to each worker
     """
-    from services.predict import MachineLearningModelHandlerScore
+    # from services.predict import MachineLearningModelHandlerScore as model
+    from services.predict import BERTModelHandler as model
 
     # TODO: Fix this so we can more easily use env variables to pass in the load mechanism
-    MachineLearningModelHandlerScore.get_model(
-        load_model_loaders()[MODEL_LOADER])
+    model.get_model()
 
 
 def download_latest_wandb_model():
