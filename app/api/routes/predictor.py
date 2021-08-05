@@ -1,7 +1,9 @@
 from typing import Any
 
 import joblib
+from core.config import MODEL_LOADER
 from core.errors import PredictException
+from core.model_loaders import load_model_loaders
 from fastapi import APIRouter, HTTPException
 from loguru import logger
 from models.prediction import HealthResponse, MachineLearningResponse
@@ -11,7 +13,8 @@ router = APIRouter()
 
 
 def get_prediction(data_input): return MachineLearningResponse(
-    model.predict(data_input, load_wrapper=joblib.load, method="predict_proba")
+    model.predict(
+        data_input, load_wrapper=load_model_loaders()[MODEL_LOADER], method="predict_proba")
 )
 
 

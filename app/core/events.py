@@ -3,6 +3,9 @@ from typing import Callable
 import joblib
 from fastapi import FastAPI
 
+from core.config import MODEL_LOADER
+from core.model_loaders import load_model_loaders
+
 
 def preload_model():
     """
@@ -11,7 +14,8 @@ def preload_model():
     from services.predict import MachineLearningModelHandlerScore
 
     # TODO: Fix this so we can more easily use env variables to pass in the load mechanism
-    MachineLearningModelHandlerScore.get_model(joblib.load)
+    MachineLearningModelHandlerScore.get_model(
+        load_model_loaders()[MODEL_LOADER])
 
 
 def download_latest_wandb_model():

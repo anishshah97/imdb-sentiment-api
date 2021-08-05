@@ -32,3 +32,5 @@ LOCAL_MODEL_DIR = config("LOCAL_MODEL_DIR", default="./ml/model/")
 LOCAL_MODEL_NAME = config("LOCAL_MODEL_NAME", default="model.pkl")
 
 MODEL_VERSION = config("MODEL_VERSION", default="latest")
+
+MODEL_LOADER = config("MODEL_LOADER", default="joblib")
