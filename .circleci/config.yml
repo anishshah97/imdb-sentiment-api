@@ -1,0 +1,99 @@
+version: 2.1
+description: "Deploying heroku-circleci-docker-fastapi to Heroku"
+
+jobs:
+  # Code Linting
+  lint:
+    docker:
+      - image: circleci/python:3.7-node
+    steps:
+      - checkout
+      - run:
+          name: Install Python Dependencies
+          command: |
+            pip3 install -r requirements.txt --no-cache-dir
+      - run:
+          name: Lint Code
+          command: |
+            flake8
+  # API Tests
+  test:
+    docker:
+      - image: circleci/python:3.7-node
+        user: root
+    steps:
+      - checkout
+      - run:
+          name: Install Python Dependencies
+          command: |
+            pip3 install -r requirements.txt --no-cache-dir
+      - run:
+          name: Run Tests
+          command: |
+            coverage run -m pytest
+  # Build Docker Container And Deploy To Heroku
+  docker-build-release:
+    machine:
+      enabled: true
+    parameters:
+      app-name:
+        description: "The Heroku app name to which the application should be deployed"
+        type: string
+      app-type:
+        description: "The Heroku app type (web or worker) of the application to be deployed"
+        type: string
+        default: "web"
+    steps:
+      - checkout # Checkout code from github repository
+      - run:
+          name: View Files
+          command: |
+            ls -ll
+      - run:
+          name: Install Heroku CLI
+          command: |
+            curl https://cli-assets.heroku.com/install.sh | sh
+      - run:
+          name: Login into Heroku Docker Repository
+          command: |
+            docker login --username=$HEROKU_EMAIL --password=$HEROKU_API_KEY registry.heroku.com
+      - run:
+          name: Verify Container Login
+          command: |
+            heroku container:login
+      - run:
+          name: Build Docker Container
+          command: |
+            docker build --rm=false -t registry.heroku.com/<< parameters.app-name >>/<< parameters.app-type >> .
+      - run:
+          name: Push Container To Heroku
+          command: |
+            docker push registry.heroku.com/<< parameters.app-name >>/<< parameters.app-type >>
+      - run:
+          name: Release Deployed Container
+          command: |
+            heroku container:release << parameters.app-type >> -a << parameters.app-name >>
+machine:
+  services:
+    - docker
+
+dependencies:
+  cache_directories:
+    - ~/docker
+
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - lint # Linting is run for every branch.
+      - test # Tests are run for every branch.
+
+      # Production [branch=master]
+      - docker-build-release:
+          requires:
+            - lint
+            - test
+          app-name: "${APP_PREFIX}-production"
+          filters:
+            branches:
+              only: master # Only run this build and deploy for master branch.
