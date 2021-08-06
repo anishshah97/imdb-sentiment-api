@@ -85,14 +85,14 @@ workflows:
   version: 2
   build_and_deploy:
     jobs:
-      - lint # Linting is run for every branch.
-      - test # Tests are run for every branch.
+      # - lint # Linting is run for every branch.
+      # - test # Tests are run for every branch.
 
       # Production [branch=master]
       - docker-build-release:
-          requires:
-            - lint
-            - test
+          # requires:
+          #   - lint
+          #   - test
           app-name: "${APP_PREFIX}-production"
           filters:
             branches:
