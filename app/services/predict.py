@@ -2,12 +2,14 @@ import os
 import shutil
 
 import tensorflow as tf
+import wandb
 from core.config import (LOCAL_MODEL_DIR, LOCAL_MODEL_NAME, MODEL_VERSION,
                          PROJECT_NAME)
 from core.errors import ModelLoadException, PredictException
 from core.model_loaders import load_model_loaders
 from loguru import logger
-from transformers import BertTokenizer, TFBertForSequenceClassification
+from transformers import (DistilBertTokenizerFast,
+                          TFDistilBertForSequenceClassification)
 
 
 class MachineLearningModelHandlerScore(object):
@@ -46,68 +48,76 @@ class MachineLearningModelHandlerScore(object):
 
 
 class BERTModelHandler(MachineLearningModelHandlerScore):
-    model = TFBertForSequenceClassification.from_pretrained(
-        "bert-base-uncased")
-    tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+    # model = TFDistilBertForSequenceClassification.from_pretrained(
+    #     "bert-base-uncased")
+    model = None
+    tokenizer = DistilBertTokenizerFast.from_pretrained(
+        "distilbert-base-uncased")
 
     @classmethod
-    def predict(cls, input):
-        model = cls.get_model()
-        logger.debug(input)
-        tf_batch = cls.tokenizer(input, max_length=128,
-                                 padding=True, truncation=True, return_tensors='tf')
-        logger.debug(tf_batch)
-        tf_outputs = model(tf_batch)
-        tf_predictions = tf.nn.softmax(tf_outputs[0], axis=-1)
-        labels = ['Negative', 'Positive']
-        label = tf.argmax(tf_predictions, axis=1)
-        label = label.numpy()
-        bert_sentiment_responses = []
-        for i in range(len(input)):
-            sentiment_response = {
-                "input": input[i],
-                "prediction_label": labels[label[i]]
+    def predict(cls, text):
+        model = cls.get_model(load_model_loaders()["transformers"])
+        tokenizer = cls.tokenizer
+
+        with wandb.init(project=PROJECT_NAME, job_type="inference") as run:
+            tf_batch = tokenizer(
+                text, max_length=128, padding=True, truncation=True, return_tensors='tf')
+            tf_outputs = model(tf_batch)
+            tf_predictions = tf.nn.softmax(tf_outputs[0], axis=-1)
+            labels = ['Negative', 'Positive']
+            label = tf.argmax(tf_predictions, axis=1)
+            label = label.numpy()
+            confidences = tf_predictions[0]
+            negative_confidence = confidences[0]
+            positive_confidence = confidences[1]
+            resp = {'text': text, 'sentiment': labels[label[0]], 'confidences': {
+                'negative': float(negative_confidence), 'positive': float(positive_confidence)}}
+
+            wandb_log = {
+                "negative": resp["confidences"]["negative"],
+                "positive": resp["confidences"]["positive"]
             }
-            bert_sentiment_responses.append(sentiment_response)
-        return bert_sentiment_responses
 
-    @classmethod
-    def get_model(cls, **kwargs):
-        weights_path = cls.get_weights_path()
-        logger.debug(weights_path)
-        cls.model.load_weights(weights_path)
-        return cls.model
+            run.log(wandb_log)
 
-    @staticmethod
-    def get_weights_path(**kwargs):
-        if LOCAL_MODEL_DIR.endswith("/"):
-            path = f"{LOCAL_MODEL_DIR}{LOCAL_MODEL_NAME}"
-        else:
-            path = f"{LOCAL_MODEL_DIR}/{LOCAL_MODEL_NAME}"
-        if not os.path.exists(path):
-            message = f"Machine learning model at {path} not exists!"
-            logger.error(message)
-            raise FileNotFoundError(message)
-        return path+"/weights.h5"
+        return resp
+
+    # @classmethod
+    # def get_model(cls, **kwargs):
+    #     weights_path = cls.get_weights_path()
+    #     logger.debug(weights_path)
+    #     cls.model.load_weights(weights_path)
+    #     return cls.model
+
+    # @staticmethod
+    # def get_weights_path(**kwargs):
+    #     if LOCAL_MODEL_DIR.endswith("/"):
+    #         path = f"{LOCAL_MODEL_DIR}{LOCAL_MODEL_NAME}"
+    #     else:
+    #         path = f"{LOCAL_MODEL_DIR}/{LOCAL_MODEL_NAME}"
+    #     if not os.path.exists(path):
+    #         message = f"Machine learning model at {path} not exists!"
+    #         logger.error(message)
+    #         raise FileNotFoundError(message)
+    #     return path+"/weights.h5"
 
 
 class WANDBHandler(object):
 
     def download_latest_model():
-        import wandb
-        run = wandb.init(project=PROJECT_NAME, job_type="inference")
-        model_at = run.use_artifact(LOCAL_MODEL_NAME.split(".")[
-                                    0] + ":" + MODEL_VERSION)
+        with wandb.init(project=PROJECT_NAME, job_type="download") as run:
+            model_at = run.use_artifact(LOCAL_MODEL_NAME.split(".")[
+                                        0] + ":" + MODEL_VERSION)
 
-        if LOCAL_MODEL_DIR.endswith("/"):
-            path = f"{LOCAL_MODEL_DIR}{LOCAL_MODEL_NAME}"
-        else:
-            path = f"{LOCAL_MODEL_DIR}/{LOCAL_MODEL_NAME}"
+            if LOCAL_MODEL_DIR.endswith("/"):
+                path = f"{LOCAL_MODEL_DIR}{LOCAL_MODEL_NAME}"
+            else:
+                path = f"{LOCAL_MODEL_DIR}/{LOCAL_MODEL_NAME}"
 
-        if os.path.exists(path):
-            message = f"Machine learning model at {path} exists! Overwriting"
-            logger.info(message)
-            shutil.rmtree(path)
+            if os.path.exists(path):
+                message = f"Machine learning model at {path} exists! Overwriting"
+                logger.info(message)
+                shutil.rmtree(path)
 
-        model_at.download(path)
+            model_at.download(path)
         return None

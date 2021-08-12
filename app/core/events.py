@@ -15,7 +15,7 @@ def preload_model():
     from services.predict import BERTModelHandler as model
 
     # TODO: Fix this so we can more easily use env variables to pass in the load mechanism
-    model.get_model()
+    model.get_model(load_model_loaders()["transformers"])
 
 
 def download_latest_wandb_model():

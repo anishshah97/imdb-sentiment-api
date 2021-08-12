@@ -73,6 +73,10 @@ jobs:
           name: Release Deployed Container
           command: |
             heroku container:release << parameters.app-type >> -a << parameters.app-name >>
+      -run:
+          name: Print Heroku Logs
+          commnad: |
+            heroku logs --tail
 machine:
   services:
     - docker

@@ -6,7 +6,8 @@ from core.errors import PredictException
 from core.model_loaders import load_model_loaders
 from fastapi import APIRouter, HTTPException
 from loguru import logger
-from models.prediction import BERTSentimentResponse, HealthResponse
+from models.prediction import (BERTSentimentRequest, BERTSentimentResponse,
+                               HealthResponse)
 from services.predict import BERTModelHandler as model
 
 # from models.prediction import MachineLearningResponse
@@ -22,17 +23,21 @@ router = APIRouter()
 
 
 @router.get("/predict", response_model=BERTSentimentResponse, name="predict:get-data")
-async def predict(data_input: str = None):
-    print(data_input)
-    if not data_input:
+async def predict(request: BERTSentimentRequest):
+    if not request:
         raise HTTPException(
             status_code=404, detail=f"'data_input' argument invalid!")
     try:
-        predictions = model.predict([data_input])
+        predictions = model.predict([request.text])
+        sentiment_response = BERTSentimentResponse(
+            text=request.text,
+            sentiment=predictions["sentiment"],
+            confidences=predictions["confidences"],
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Exception: {e}")
 
-    return BERTSentimentResponse(predictions=predictions)
+    return sentiment_response
 
 
 @router.get(

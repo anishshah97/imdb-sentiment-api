@@ -1,0 +1,33 @@
+steps:
+  # Download the model to embed it into the image
+  # - name: 'gcr.io/cloud-builders/gsutil'
+  #   args: ['cp','-r', 'gs://machine-learning-samples/models/sentiment/model', '.']
+  #   id: 'download-model'
+  # Build the container image
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-t", "gcr.io/banishimdbsenmodel/sentiment", "."]
+    # waitFor: ["download-model"]
+  # Push the container image to Container Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/banishimdbsenmodel/sentiment"]
+  # Deploy container image to Cloud Run
+  - name: "gcr.io/cloud-builders/gcloud"
+    args:
+      [
+        "run",
+        "deploy",
+        "sentiment",
+        "--image",
+        "gcr.io/banishimdbsenmodel/sentiment",
+        "--region",
+        "us-east1",
+        "--platform",
+        "managed",
+        "--memory",
+        "3000Mi",
+        "--allow-unauthenticated",
+        "--max-instances",
+        "5",
+      ]
+images:
+  - gcr.io/banishimdbsenmodel/sentiment
