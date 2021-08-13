@@ -29,5 +29,10 @@ steps:
         "--max-instances",
         "5",
       ]
+    secretEnv: ["WANDB_API_KEY"]
 images:
   - gcr.io/banishimdbsenmodel/sentiment
+availableSecrets:
+  secretManager:
+    - versionName: projects/385692184392/secrets/ash0ts-wandb/versions/1
+      env: "WANDB_API_KEY"
