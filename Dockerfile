@@ -17,6 +17,14 @@ RUN pip3 install --upgrade pip && \
 RUN pip3 install gunicorn
 
 COPY . ./
+
+# Default env variables for imdb model. Can set and override from cloudbuild
+ENV DEBUG=True
+ENV LOCAL_MODEL_DIR="./ml/model/"
+ENV LOCAL_MODEL_NAME="imdb_sen_model"
+ENV MODEL_VERSION="latest"
+ENV MODEL_LOADER="transformers"
+
 ENV PYTHONPATH app
 
 CMD uvicorn main:app --host=0.0.0.0 --port=${PORT:-5000}

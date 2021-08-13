@@ -13,7 +13,7 @@ from core.events import create_wandb_download_and_preload_handler
 
 
 def get_application() -> FastAPI:
-    logger.info(os.environ)
+    logger.error(os.environ)
     application = FastAPI(title=PROJECT_NAME, debug=DEBUG, version=VERSION)
     application.include_router(api_router, prefix=API_PREFIX)
     application.add_event_handler(

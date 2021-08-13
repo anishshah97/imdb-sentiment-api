@@ -28,14 +28,15 @@ steps:
         "--allow-unauthenticated",
         "--max-instances",
         "5",
+        "--update-env-vars=WANDB_API_KEY=$$WANDB_API_KEY",
       ]
     secretEnv: ["WANDB_API_KEY"]
-    env:
-      - DEBUG=True
-      - LOCAL_MODEL_DIR="./ml/model/"
-      - LOCAL_MODEL_NAME="imdb_sen_model"
-      - MODEL_VERSION="latest"
-      - MODEL_LOADER="transformers"
+    # env:
+    #   - DEBUG=True
+    #   - LOCAL_MODEL_DIR="./ml/model/"
+    #   - LOCAL_MODEL_NAME="imdb_sen_model"
+    #   - MODEL_VERSION="latest"
+    #   - MODEL_LOADER="transformers"
 images:
   - gcr.io/banishimdbsenmodel/sentiment
 availableSecrets:
