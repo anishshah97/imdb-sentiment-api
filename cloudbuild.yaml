@@ -30,6 +30,12 @@ steps:
         "5",
       ]
     secretEnv: ["WANDB_API_KEY"]
+    env:
+      - DEBUG=True
+      - LOCAL_MODEL_DIR="./ml/model/"
+      - LOCAL_MODEL_NAME="imdb_sen_model"
+      - MODEL_VERSION="latest"
+      - MODEL_LOADER="transformers"
 images:
   - gcr.io/banishimdbsenmodel/sentiment
 availableSecrets:
