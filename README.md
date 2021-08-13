@@ -10,6 +10,10 @@ In this assignment we will be showing an end to end CI/CD flow for the deploymen
 
 # [Live WANDB Dashboard](https://wandb.ai/ash0ts/imdb-sentiment-api/reports/IMDB-Sentiment-Dashboard--Vmlldzo5MzIwNjQ)
 
+# [Finetuneable DistilBERT Training on Colab](https://colab.research.google.com/drive/1w8zTkvjf_owofY8tWmsgVJRvWTwvIlwv?usp=sharing)
+
+> Note: It is best to make a copy of the colab and then run it locally to setup and recreat the experiment
+
 ## Table of Contents
 
 [Description](https://github.com/anishshah97/imdb-sentiment-api#description)
