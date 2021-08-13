@@ -12,6 +12,10 @@ from transformers import (DistilBertTokenizerFast,
                           TFDistilBertForSequenceClassification)
 
 
+# TODO: Have this class also be able to handle any
+# preprocessing/postprocessing in seperate named
+# steps outside of predict to more easily allow for
+# extensability
 class MachineLearningModelHandlerScore(object):
     model = None
 
