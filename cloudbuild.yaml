@@ -14,7 +14,7 @@ steps:
   - name: "gcr.io/cloud-builders/gcloud"
     args:
       [
-        "beta",
+        "-c",
         "run",
         "deploy",
         "sentiment",
@@ -29,11 +29,11 @@ steps:
         "--allow-unauthenticated",
         "--max-instances",
         "5",
-        "--set-secrets",
-        "WANDB_API_KEY=ash0ts-wandb:latest",
+        "--update-env-vars",
+        "WANDB_API_KEY=$$WANDB_API_KEY",
       ]
-    # secretEnv:
-    #   - "WANDB_API_KEY"
+    secretEnv:
+      - "WANDB_API_KEY"
     # env:
     #   - DEBUG=True
     #   - LOCAL_MODEL_DIR='./ml/model/'
@@ -42,7 +42,7 @@ steps:
     #   - MODEL_LOADER='transformers'
 images:
   - gcr.io/banishimdbsenmodel/sentiment
-# availableSecrets:
-#   secretManager:
-#     - env: "WANDB_API_KEY"
-#       versionName: projects/385692184392/secrets/ash0ts-wandb/versions/latest
+availableSecrets:
+  secretManager:
+    - env: "WANDB_API_KEY"
+      versionName: projects/385692184392/secrets/ash0ts-wandb/versions/latest
