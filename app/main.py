@@ -1,6 +1,9 @@
+import os
+
 import uvicorn
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
+from loguru import logger
 # from prometheus_fastapi_instrumentator import Instrumentator
 from starlette.exceptions import HTTPException
 
@@ -10,6 +13,7 @@ from core.events import create_wandb_download_and_preload_handler
 
 
 def get_application() -> FastAPI:
+    logger.info(os.environ)
     application = FastAPI(title=PROJECT_NAME, debug=DEBUG, version=VERSION)
     application.include_router(api_router, prefix=API_PREFIX)
     application.add_event_handler(
