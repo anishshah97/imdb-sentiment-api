@@ -23,14 +23,17 @@ router = APIRouter()
 
 
 @router.get("/predict", response_model=BERTSentimentResponse, name="predict:get-data")
-async def predict(request: BERTSentimentRequest):
-    if not request:
+# async def predict(request: BERTSentimentRequest):
+async def predict(text: str):
+    # text = request.text
+    # if not request:
+    if not text:
         raise HTTPException(
             status_code=404, detail=f"'data_input' argument invalid!")
     try:
-        predictions = model.predict([request.text])
+        predictions = model.predict([text])
         sentiment_response = BERTSentimentResponse(
-            text=request.text,
+            text=text,
             sentiment=predictions["sentiment"],
             confidences=predictions["confidences"],
         )
