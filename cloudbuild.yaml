@@ -6,7 +6,7 @@ steps:
   # Build the container image
   - name: "gcr.io/cloud-builders/docker"
     args: ["build", "-t", "gcr.io/banishimdbsenmodel/sentiment", "."]
-    # waitFor: ["download-model"]
+    # waitFor: ['download-model']
   # Push the container image to Container Registry
   - name: "gcr.io/cloud-builders/docker"
     args: ["push", "gcr.io/banishimdbsenmodel/sentiment"]
@@ -28,18 +28,20 @@ steps:
         "--allow-unauthenticated",
         "--max-instances",
         "5",
-        "--update-env-vars=WANDB_API_KEY=$WANDB_API_KEY",
+        "--set-env-vars",
+        "WANDB_API_KEY=$$WANDB_API_KEY",
       ]
-    secretEnv: ["WANDB_API_KEY"]
+    secretEnv:
+      - "WANDB_API_KEY"
     # env:
     #   - DEBUG=True
-    #   - LOCAL_MODEL_DIR="./ml/model/"
-    #   - LOCAL_MODEL_NAME="imdb_sen_model"
-    #   - MODEL_VERSION="latest"
-    #   - MODEL_LOADER="transformers"
+    #   - LOCAL_MODEL_DIR='./ml/model/'
+    #   - LOCAL_MODEL_NAME='imdb_sen_model'
+    #   - MODEL_VERSION='latest'
+    #   - MODEL_LOADER='transformers'
 images:
   - gcr.io/banishimdbsenmodel/sentiment
 availableSecrets:
   secretManager:
-    - versionName: projects/385692184392/secrets/ash0ts-wandb/versions/1
-      env: "WANDB_API_KEY"
+    - env: "WANDB_API_KEY"
+      versionName: projects/385692184392/secrets/ash0ts-wandb/versions/latest
