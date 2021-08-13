@@ -29,7 +29,7 @@ steps:
         "--allow-unauthenticated",
         "--max-instances",
         "5",
-        "--update-secrets",
+        "--set-secrets",
         "WANDB_API_KEY=ash0ts-wandb:latest",
       ]
     # secretEnv:
