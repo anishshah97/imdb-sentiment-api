@@ -28,7 +28,7 @@ steps:
         "--allow-unauthenticated",
         "--max-instances",
         "5",
-        "--update-env-vars=WANDB_API_KEY=$$WANDB_API_KEY",
+        "--update-env-vars=WANDB_API_KEY=$WANDB_API_KEY",
       ]
     secretEnv: ["WANDB_API_KEY"]
     # env:
